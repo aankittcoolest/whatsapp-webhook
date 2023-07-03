@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import serverless from "serverless-http";
 import bodyParser from "body-parser";
+import axios from "axios";
 
 const api = express();
 
@@ -17,9 +18,39 @@ router.get("/whatsapp-webhook", (req, res) => {
   return res.sendStatus(400);
 });
 
-router.post("/whatsapp-webhook", (req, res) => {
+router.post("/whatsapp-webhook", async (req, res) => {
   console.log("Received webhook:");
-  console.log(JSON.stringify(req.body, null, 4));
+  const changes = req.body.entry.changes;
+  const messages = changes[changes.len() - 1].messages;
+  const current_message = messages[messages.len() - 1];
+
+  if (
+    current_message.from === `${process.env.WHATS_APP_ENTITY1_NUMBER}` &&
+    current_message.type === "text"
+  ) {
+    console.log("This qualifies me to forward the message");
+    const message_format = {
+      messaging_product: "whatsapp",
+      to: `${process.env.WHATS_APP_ENTITY1_NUMBER}`,
+      type: "text",
+      text: current_message.text,
+    };
+
+    //forward the message
+    const { data } = await axios.post(
+      `${process.env.WHATS_APP_MESSAGE_ENDPOINT}`,
+      message_format,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.WHATS_APP_TOKEN}`,
+        },
+      }
+    );
+    console.log(JSON.stringify(data, null, 4));
+  }
+  // console.log(JSON.stringify(req.body, null, 4));
+  console.log(req.body);
   res.status(200).json({
     message: JSON.stringify(req.body),
   });
