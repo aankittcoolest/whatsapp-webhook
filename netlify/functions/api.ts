@@ -20,7 +20,9 @@ router.get("/whatsapp-webhook", (req, res) => {
 
 router.post("/whatsapp-webhook", async (req, res) => {
   console.log("Received webhook:");
-  const changes = req.body.entry.changes;
+  console.log(JSON.stringify(req.body, null, 4));
+  const entries = req.body.entry
+  const changes = entries[entries.length - 1].messages;
   const messages = changes[changes.length - 1].messages;
   const current_message = messages[messages.length - 1];
 
