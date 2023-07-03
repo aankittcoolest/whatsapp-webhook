@@ -8,15 +8,13 @@ const router = Router();
 api.use(bodyParser.json());
 
 router.get("/whatsapp-webhook", (req, res) => {
-  if (req.query.hub) {
-    if (
-      req.query["hub.mode"] == "subscribe" &&
-      req.query["hub.verify_token"] == "a547dddfa1fb76b69935f35b9bad5f3e"
-    ) {
-      return res.send(req.query["hub.challenge"]);
-    }
-    res.sendStatus(400);
+  if (
+    req.query["hub.mode"] == "subscribe" &&
+    req.query["hub.verify_token"] == "a547dddfa1fb76b69935f35b9bad5f3e"
+  ) {
+    return res.send(req.query["hub.challenge"]);
   }
+  return res.sendStatus(400);
 });
 
 router.post("/whatsapp-webhook", (req, res) => {
