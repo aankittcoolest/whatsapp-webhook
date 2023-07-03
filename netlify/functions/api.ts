@@ -21,8 +21,8 @@ router.get("/whatsapp-webhook", (req, res) => {
 router.post("/whatsapp-webhook", async (req, res) => {
   console.log("Received webhook:");
   const changes = req.body.entry.changes;
-  const messages = changes[changes.len() - 1].messages;
-  const current_message = messages[messages.len() - 1];
+  const messages = changes[changes.length - 1].messages;
+  const current_message = messages[messages.length - 1];
 
   if (
     current_message.from === `${process.env.WHATS_APP_ENTITY1_NUMBER}` &&
