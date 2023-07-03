@@ -17,8 +17,6 @@ router.get("/whatsapp-webhook", (req, res) => {
     }
     res.sendStatus(400);
   }
-  console.log("Received webhook:", req.body);
-  res.sendStatus(200);
 });
 
 router.post("/whatsapp-webhook", (req, res) => {
