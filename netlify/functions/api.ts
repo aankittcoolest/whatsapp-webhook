@@ -11,7 +11,7 @@ api.use(bodyParser.json());
 router.get("/whatsapp-webhook", (req, res) => {
   if (
     req.query["hub.mode"] == "subscribe" &&
-    req.query["hub.verify_token"] == "a547dddfa1fb76b69935f35b9bad5f3e"
+    req.query["hub.verify_token"] === `${process.env.WHATS_APP_VERIFY_TOKEN}`
   ) {
     return res.send(req.query["hub.challenge"]);
   }
@@ -20,37 +20,37 @@ router.get("/whatsapp-webhook", (req, res) => {
 
 router.post("/whatsapp-webhook", async (req, res) => {
   console.log("Received webhook:");
-  const entries = req.body.entry
+  const entries = req.body.entry;
   const changes = entries[entries.length - 1].changes;
   if (changes[changes.length - 1].value.messages) {
-  const messages = changes[changes.length - 1].value.messages;
-  const current_message = messages[messages.length - 1];
+    const messages = changes[changes.length - 1].value.messages;
+    const current_message = messages[messages.length - 1];
 
-  if (
-    current_message.from === `${process.env.WHATS_APP_ENTITY1_NUMBER}` &&
-    current_message.type === "text"
-  ) {
-    const message_format = {
-      messaging_product: "whatsapp",
-      to: `${process.env.WHATS_APP_ENTITY2_NUMBER}`,
-      type: "text",
-      text: current_message.text,
-    };
+    if (
+      current_message.from === `${process.env.WHATS_APP_ENTITY1_NUMBER}` &&
+      current_message.type === "text"
+    ) {
+    console.log("Getting ready to forward the message.");
+      const message_format = {
+        messaging_product: "whatsapp",
+        to: `${process.env.WHATS_APP_ENTITY2_NUMBER}`,
+        type: "text",
+        text: current_message.text,
+      };
 
-    //forward the message
-    const { data } = await axios.post(
-      `${process.env.WHATS_APP_MESSAGE_ENDPOINT}`,
-      message_format,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.WHATS_APP_TOKEN}`,
-        },
-      }
-    );
-    console.log(JSON.stringify(data, null, 4));
-
-  }
+      //forward the message
+      const { data } = await axios.post(
+        `${process.env.WHATS_APP_MESSAGE_ENDPOINT}`,
+        message_format,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.WHATS_APP_TOKEN}`,
+          },
+        }
+      );
+      console.log(JSON.stringify(data, null, 4));
+    }
   }
   // console.log(JSON.stringify(req.body, null, 4));
   console.log(req.body);
