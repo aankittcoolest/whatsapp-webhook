@@ -18,7 +18,8 @@ router.get("/whatsapp-webhook", (req, res) => {
 });
 
 router.post("/whatsapp-webhook", (req, res) => {
-  console.log("Received webhook:", req.body);
+  console.log("Received webhook:");
+  console.log(JSON.stringify(req.body, null, 4));
   res.status(200).json({
     message: JSON.stringify(req.body),
   });
